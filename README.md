@@ -16,18 +16,35 @@ O principal objetivo do jogo é sobreviver o maior tempo possível, eliminando i
 
 # Mecânicas e Sistemas
 
-- Movimentação lateral do jogador;
-- Sistema de disparos;
-- Helicópteros inimigos;
-- Sistema de paraquedistas;
-- Sistema de colisão;
-- Sistema de pontuação;
-- Progressão dinâmica de dificuldade;
+## Sistemas implementados
+
+- Gerenciamento de estados do jogo;
+- Sistema de menu inicial;
 - Sistema de pause;
 - Tela de ranking;
-- Interface retrô inspirada em jogos arcade clássicos;
+- Sistema de HUD;
+- Sistema de debug;
+- Spawn progressivo de helicópteros;
+- Sistema de paraquedistas independentes;
+- Progressão dinâmica de dificuldade;
+- Sistema de waves;
+- Arquitetura modular para integração de sistemas;
+- Loop principal centralizado;
+- Gerenciamento de entidades em tempo real.
+
+---
+
+## Sistemas em desenvolvimento
+
+- Movimentação lateral do jogador;
+- Sistema de disparos;
+- Sistema de colisão;
+- Sistema de pontuação avançado;
 - Sistema de efeitos sonoros;
-- Registro de pontuações com nomes dos jogadores.
+- Registro persistente de ranking;
+- Sistema de explosões e partículas;
+- IA dos inimigos;
+- Sprites definitivos e animações.
 
 ---
 
@@ -58,7 +75,9 @@ Os demais arquivos são responsáveis por funcionalidades específicas, como:
 - sistema de explosões;
 - controle de colisões e eventos.
 
-Essa organização facilita a manutenção do projeto, o trabalho em equipe e a escalabilidade do desenvolvimento.
+Além disso, o projeto utiliza uma estrutura baseada em entidades independentes, permitindo que helicópteros, paraquedistas e futuros inimigos sejam atualizados e renderizados separadamente, facilitando manutenção, escalabilidade e integração entre equipes.
+
+Essa organização melhora significativamente o desenvolvimento colaborativo e reduz conflitos durante a implementação de novas funcionalidades.
 
 ---
 
@@ -76,6 +95,7 @@ Sabotage2/
 ├── Explosion.pde
 ├── ScoreSystem.pde
 ├── RankingSystem.pde
+├── SoldierManager.pde
 ├── SoundManager.pde
 │
 ├── data/
@@ -92,9 +112,7 @@ Sabotage2/
 
 Faça o download do Processing através do site oficial:
 
-```text
 https://processing.org/download
-```
 
 ---
 
@@ -122,6 +140,19 @@ Sabotage2.pde
 
 ---
 
+# Controles
+
+| Tecla | Função |
+|------|------|
+| ENTER | Iniciar partida |
+| P | Pausar jogo |
+| TAB | Abrir ranking |
+| R | Reiniciar partida |
+| F | Ativar modo debug |
+| ESC | Voltar ao menu |
+
+---
+
 # Objetivo Acadêmico
 
 Este projeto foi desenvolvido como atividade avaliativa da disciplina de Desenvolvimento de Games, com foco em:
@@ -131,7 +162,7 @@ Este projeto foi desenvolvido como atividade avaliativa da disciplina de Desenvo
 - organização de projetos;
 - arquitetura de software;
 - manipulação de sprites;
-- sistemas de colisão;
+- sistemas de entidades;
 - implementação de mecânicas arcade;
 - trabalho em equipe;
 - controle de versão com Git e GitHub.
@@ -154,33 +185,25 @@ Este projeto foi desenvolvido como atividade avaliativa da disciplina de Desenvo
 
 ## Processing Official Website
 
-```text
 https://processing.org/
-```
 
 ---
 
 ## Wikipedia – Sabotage (1981)
 
-```text
 https://en.wikipedia.org/wiki/Sabotage_(video_game)
-```
 
 ---
 
 ## Wikipedia – Paratrooper (1982)
 
-```text
 https://en.wikipedia.org/wiki/Paratrooper_(video_game)
-```
 
 ---
 
 ## RetroGames – Paratrooper
 
-```text
 https://www.retrogames.cz/play_616-DOS.php
-```
 
 ---
 
@@ -192,9 +215,12 @@ Atualmente o projeto possui:
 
 - estrutura principal do jogo;
 - gerenciamento de estados;
-- HUD;
+- HUD funcional;
 - menu inicial;
 - sistema de pause;
 - tela de ranking;
-- arquitetura base para integração dos sistemas;
-- estrutura modular para desenvolvimento em equipe.
+- sistema de spawn de helicópteros;
+- sistema de paraquedistas independentes;
+- sistema de waves e dificuldade progressiva;
+- arquitetura modular para integração dos sistemas;
+- estrutura preparada para desenvolvimento em equipe.
