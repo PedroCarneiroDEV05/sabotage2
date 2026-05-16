@@ -2,8 +2,9 @@
 class Parachuter extends Enemy {
   boolean landed; // false = caindo | true = andando no chão
   float landY;    // altura do chão
+  boolean movingRight;
 
-  Parachuter(float x, float y, int currentWave) {
+  Parachuter(float x, float y, int currentWave, boolean movingRight) {
     // HP aumenta progressivamente por tier de wave:
     // wave  1-5  → 1 HP
     // wave  6-8  → 2 HP
@@ -17,6 +18,7 @@ class Parachuter extends Enemy {
     this.landed = false;
     this.landY = height - 40;
     this.escaped = false;
+    this.movingRight = movingRight;
   }
 
   void update() {
@@ -29,7 +31,7 @@ class Parachuter extends Enemy {
       }
     } else {
       // andando no chão após pousar
-      x += speed * 0.8;
+      x += movingRight ? speed * 0.8 : -speed * 0.8;
       // sair pela lateral = escapou, conta como dano ao jogador
       if (x < -20 || x > width + 20) {
         alive = false;

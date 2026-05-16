@@ -18,7 +18,7 @@ class Helicopter extends Enemy {
 
     if (dropTimer >= dropInterval) {
       dropTimer = 0;
-      dropped.add(new Parachuter(x, y, wave));
+      dropped.add(new Parachuter(x, y, wave, movingRight));
     }
 
     if (isOffScreen()) {
