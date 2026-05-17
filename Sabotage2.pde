@@ -55,6 +55,8 @@ void setup() {
   parachuters = new ArrayList<Parachuter>();
 
   explosions = new ArrayList();
+  
+  initSounds();
 
   initializeGame();
 }
