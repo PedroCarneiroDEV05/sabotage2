@@ -1,10 +1,9 @@
-// Paraquedista — cai do helicóptero e caminha pelo chão até sair da tela
+// Paraquedista — cai do helicóptero e caminha pelo chão em direção ao centro da tela
 class Parachuter extends Enemy {
   boolean landed; // false = caindo | true = andando no chão
   float landY;    // altura do chão
-  boolean movingRight;
 
-  Parachuter(float x, float y, int currentWave, boolean movingRight) {
+  Parachuter(float x, float y, int currentWave) {
     // HP aumenta progressivamente por tier de wave:
     // wave  1-5  → 1 HP
     // wave  6-8  → 2 HP
@@ -18,21 +17,25 @@ class Parachuter extends Enemy {
     this.landed = false;
     this.landY = height - 40;
     this.escaped = false;
-    this.movingRight = movingRight;
   }
 
   void update() {
     if (!landed) {
-      // caindo
+      // caindo verticalmente até o chão
       y += speed;
       if (y >= landY) {
         landed = true;
         y = landY;
       }
     } else {
-      // andando no chão após pousar
-      x += movingRight ? speed * 0.8 : -speed * 0.8;
-      // sair pela lateral = escapou, conta como dano ao jogador
+      // após pousar, anda sempre em direção ao centro da tela
+      float centerX = width / 2;
+      if (x < centerX) {
+        x += speed * 0.8; // à esquerda do centro → anda pra direita
+      } else {
+        x -= speed * 0.8; // à direita do centro → anda pra esquerda
+      }
+      // se sair da tela = escapou, Pedro conecta com sistema de vidas
       if (x < -20 || x > width + 20) {
         alive = false;
         escaped = true;
@@ -47,8 +50,8 @@ class Parachuter extends Enemy {
       fill(255, 255, 255, 180);
       arc(x, y - 30, 50, 40, PI, TWO_PI);
       stroke(200);
-      line(x - 20, y - 10, x, y);
-      line(x + 20, y - 10, x, y);
+      line(x - 20, y - 10, x, y); // corda esquerda
+      line(x + 20, y - 10, x, y); // corda direita
       noStroke();
     }
     // corpo do paraquedista
@@ -57,7 +60,7 @@ class Parachuter extends Enemy {
     rect(x - 6, y, 12, 18);    // corpo
   }
 
-  // check de colisão das balas
+  // usado pelo João para checar colisão com balas
   boolean isHit(float bx, float by) {
     return (dist(bx, by, x, y) < 15);
   }
