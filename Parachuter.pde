@@ -24,6 +24,7 @@ class Parachuter extends Enemy {
       // caindo
       y += speed;
       if (y >= landY) {
+        playParachuterHittingGroundSound();
         landed = true;
         y = landY;
       }

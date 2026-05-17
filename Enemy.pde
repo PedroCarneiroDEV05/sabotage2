@@ -58,6 +58,8 @@ void spawnHelicopter(ArrayList<Helicopter> helicopters) {
   h.dropTimer = h.dropInterval - 60;
 
   helicopters.add(h);
+  if (helicopters.size() == 1)
+    startHelicopterSound();
 }
 
 void increaseWave() {
