@@ -9,13 +9,13 @@ SoundFile parachuterLandingSound;
 SoundFile shootSound;
 
 void initSounds() {
-  helicopterSound = new SoundFile(this, "data/sounds/helicopter.wav");
-  helicopterExplosionSound = new SoundFile(this, "data/sounds/helicopter_explosion.wav");
-  parachuteExplodeSound = new SoundFile(this, "data/sounds/parachute_explode.wav");
-  parachuterExplodeSound = new SoundFile(this, "data/sounds/parachuter_explode.wav");
-  parachuterHittingGroundSound = new SoundFile(this, "data/sounds/parachuter_hitting_ground.wav");
-  parachuterLandingSound = new SoundFile(this, "data/sounds/parachuter_landing.wav");
-  shootSound = new SoundFile(this, "data/sounds/shoot.wav");
+  helicopterSound = new SoundFile(this, "sounds/helicopter.wav");
+  helicopterExplosionSound = new SoundFile(this, "sounds/helicopter_explosion.wav");
+  parachuteExplodeSound = new SoundFile(this, "sounds/parachute_explode.wav");
+  parachuterExplodeSound = new SoundFile(this, "sounds/parachuter_explode.wav");
+  parachuterHittingGroundSound = new SoundFile(this, "sounds/parachuter_hitting_ground.wav");
+  parachuterLandingSound = new SoundFile(this, "sounds/parachuter_landing.wav");
+  shootSound = new SoundFile(this, "sounds/shoot.wav");
 }
 
 void startHelicopterSound() {

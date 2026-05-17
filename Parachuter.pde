@@ -26,6 +26,7 @@ class Parachuter extends Enemy {
       if (y >= landY) {
         landed = true;
         y = landY;
+        playParachuterLandingSound(); 
       }
     } else {
       // após pousar, anda sempre em direção ao centro da tela
