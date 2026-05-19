@@ -1,5 +1,3 @@
-import processing.sound.*;
-
 // =========================
 // GAME STATES
 // =========================
@@ -21,17 +19,17 @@ int score = 0;
 int playerLives = 3;
 int gameTime = 0;
 int gameDifficulty = 1;
-RankingSystem rankingSystem;
 
 
 // =========================
 // ENTITY LISTS
 // =========================
 
-ArrayList bullets;
+ArrayList<Bullet> bullets;
 ArrayList<Helicopter> helicopters;
 ArrayList<Parachuter> parachuters;
 ArrayList explosions;
+Player player;
 
 
 // =========================
@@ -58,10 +56,8 @@ void setup() {
   parachuters = new ArrayList<Parachuter>();
 
   explosions = new ArrayList();
-  
-  initSounds();
-  
-  rankingSystem = new RankingSystem();
+
+  player = new Player();
 
   initializeGame();
 }
@@ -223,8 +219,13 @@ void keyPressed() {
   if (key == 'f' || key == 'F') {
 
     debugMode = !debugMode;
-    playShootSound();
   }
+  
+  //Atirar 
+  if (key == ' ') {
+
+  player.shoot();
+}
 }
 
 
@@ -254,7 +255,6 @@ void runGame() {
 // =========================
 
 void updateSystems() {
-
   if (frameCount % 10 == 0) {
 
     score++;
@@ -269,7 +269,23 @@ void updateSystems() {
 
     gameDifficulty = wave;
   }
+  
+  //Update Player
+  player.update();
+  
+  //Update Tiros
+  for (int i = bullets.size() - 1; i >= 0; i--) {
 
+  Bullet b = (Bullet) bullets.get(i);
+
+  b.update();
+
+  if (!b.alive) {
+
+    bullets.remove(i);
+    }
+  }
+    
   // SPAWN DOS HELICÓPTEROS
   updateSpawn(helicopters);
 
@@ -387,6 +403,14 @@ void renderSystems() {
 
     p.display();
   }
+  
+  //Balas
+  for (int i = 0; i < bullets.size(); i++) {
+
+  Bullet b = (Bullet) bullets.get(i);
+
+  b.display();
+}
 
   // FUTURAMENTE:
   // render bullets
@@ -519,15 +543,7 @@ void drawRanking() {
 
   text("3. KAYNAN - 7000", width / 2, 360);
 
-  textSize(32);
-
-  text("TOP PLAYERS", width / 2, 470);
-
-  rankingSystem.display(width / 2, 520);
-
-  textSize(20);
-
-  text("Pressione ESC para voltar", width / 2, height - 50);
+  text("Pressione ESC para voltar", width / 2, height - 80);
 }
 
 
@@ -536,21 +552,18 @@ void drawRanking() {
 // =========================
 
 void restartGame() {
-  
-  stopHelicopterSound(); 
 
   initializeGame();
-  
+
   bullets.clear();
-  
+
   helicopters.clear();
-  
+
   parachuters.clear();
-  
+
   explosions.clear();
-  
+
   gameRunning = false;
-  
+
   gameState = MENU;
-  
 }
