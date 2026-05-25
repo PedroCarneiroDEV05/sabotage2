@@ -1,3 +1,6 @@
+// Classe base abstrata para todos os inimigos do jogo.
+// Define atributos fundamentais de física e estado (vida, velocidade, status de fuga),
+// além de métodos comuns para processamento de dano.
 class Enemy {
   float x, y;
   float speed;
@@ -14,53 +17,18 @@ class Enemy {
     this.escaped = false;
   }
 
+  // Métodos implementados pelas subclasses (Helicopter, Parachuter)
   void update() {}
-
   void display() {}
 
+  // Aplica dano ao inimigo e atualiza seu estado de vida
   void takeDamage(int dmg) {
     hp -= dmg;
     if (hp <= 0) alive = false;
   }
 
+  // Verifica se a entidade ultrapassou as margens limites da tela
   boolean isOffScreen() {
     return (x < -100 || x > width + 100 || y > height + 100);
   }
-}
-
-// === SPAWN / DIFICULDADE ===
-
-int wave = 1;
-int spawnTimer = 0;
-int spawnInterval = 300;
-
-void updateSpawn(ArrayList<Helicopter> helicopters) {
-  spawnTimer++;
-  if (spawnTimer >= spawnInterval) {
-    spawnTimer = 0;
-    if (helicopters.size() < 5) {
-      spawnHelicopter(helicopters);
-    }
-  }
-}
-
-void spawnHelicopter(ArrayList<Helicopter> helicopters) {
-  float spawnX = (random(1) > 0.5) ? -60 : width + 60;
-  float spawnY = random(40, 160);
-
-  Helicopter h = new Helicopter(spawnX, spawnY);
-
-  h.speed += 0.3 * min(wave - 1, 19);
-
-  float di = max(80, h.dropInterval - 20 * min(wave - 1, 14));
-  if (wave == 10) di = max(di, 115);
-  h.dropInterval = di;
-  h.dropTimer = h.dropInterval - 60;
-
-  helicopters.add(h);
-}
-
-void increaseWave() {
-  wave++;
-  spawnInterval = max(150, spawnInterval - 20);
 }

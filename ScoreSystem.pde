@@ -1,3 +1,7 @@
+/**
+ * Estrutura de dados simples para armazenar registros individuais no Hall da Fama.
+ * Facilita a persistência e a ordenação (Sort) dentro do RankingSystem.
+ */
 class ScoreEntry {
   String name;
   int points;

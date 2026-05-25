@@ -1,5 +1,9 @@
 import processing.sound.*;
 
+// Gerenciador de efeitos sonoros.
+// Centraliza o carregamento e reprodução de todos os arquivos de áudio
+// utilizados pelo jogo, mantendo as chamadas em um escopo global isolado.
+
 SoundFile helicopterSound;
 SoundFile helicopterExplosionSound;
 SoundFile parachuteExplodeSound;
