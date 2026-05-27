@@ -19,6 +19,7 @@ final int RANKING = 3;
 final int PAUSED = 4;
 final int RANKING_CHOICE = 5;
 final int NAME_INPUT = 6;
+final int CANNON_EXPLODING = 7;
 
 int gameState = MENU;
 
@@ -59,6 +60,13 @@ int transitionAlpha = 0;
 boolean gameRunning = false;
 
 // ==========================================
+// ANIMAÇÃO DE EXPLOSÃO DO CANHÃO DO JOGADOR
+// ==========================================
+PImage[] cannonExplosionSprites;
+final int NUM_EXPLOSION_FRAMES = 6;
+int explosionTimer = 0;
+
+// ==========================================
 // SETUP & INICIALIZAÇÃO
 // ==========================================
 void setup() {
@@ -71,6 +79,12 @@ void setup() {
   player = new Player();
   initSounds();
   rankingSystem = new RankingSystem();
+  
+  // Carrega sprites de explosão retrô
+  cannonExplosionSprites = new PImage[NUM_EXPLOSION_FRAMES];
+  for (int i = 0; i < NUM_EXPLOSION_FRAMES; i++) {
+    cannonExplosionSprites[i] = loadImage("sprites/explosion_" + i + ".png");
+  }
   
   initializeGame();
 }
@@ -113,6 +127,12 @@ void draw() {
     case PAUSED: drawPauseMenu(); break;
     case RANKING_CHOICE: drawRankingChoice(); break;
     case NAME_INPUT: drawNameInput(); break;
+    case CANNON_EXPLODING: runExplosionState(); break;
+  }
+
+  // Hook para desenhar a overlay de créditos sobre o Menu ou Game Over
+  if (showCredits && (gameState == MENU || gameState == GAME_OVER)) {
+    drawCreditsOverlay();
   }
 }
 
@@ -121,6 +141,110 @@ void runGame() {
   updateSystems();
   checkCollisions();
   renderSystems();
+  renderHUD();
+}
+
+void runExplosionState() {
+  updateExplodingSystems();
+  renderExplodingSystems();
+  
+  // Renderiza a animação por sprites centralizada na base do canhão
+  int frameIndex = explosionTimer / 6; // Cada sprite frame dura 6 game frames
+  if (frameIndex < NUM_EXPLOSION_FRAMES) {
+    PImage sprite = cannonExplosionSprites[frameIndex];
+    imageMode(CENTER);
+    // Desenha centralizado na posição do canhão (tamanho 96x96 para visibilidade ideal retrô)
+    image(sprite, player.baseX, player.baseY - 15, 96, 96);
+    imageMode(CORNER);
+  }
+  
+  explosionTimer++;
+  if (explosionTimer >= NUM_EXPLOSION_FRAMES * 6) {
+    if (useRanking) {
+      rankingSystem.addScore(playerNameInput, score);
+    }
+    gameState = GAME_OVER;
+  }
+}
+
+void updateExplodingSystems() {
+  // Atualiza apenas o cenário e entidades sem receber comandos do jogador
+  for (int i = helicopters.size() - 1; i >= 0; i--) {
+    Helicopter h = helicopters.get(i);
+    h.update();
+    if (h.dropped.size() > 0) {
+      parachuters.addAll(h.dropped);
+      h.dropped.clear();
+    }
+    if (!h.alive) helicopters.remove(i);
+  }
+
+  for (int i = parachuters.size() - 1; i >= 0; i--) {
+    Parachuter p = parachuters.get(i);
+    p.update();
+    if (!p.alive) parachuters.remove(i);
+  }
+
+  for (int i = bullets.size() - 1; i >= 0; i--) {
+    Bullet b = bullets.get(i);
+    b.update();
+    if (!b.alive) bullets.remove(i);
+  }
+
+  for (int i = explosions.size() - 1; i >= 0; i--) {
+    Explosion e = explosions.get(i);
+    e.update();
+    if (e.isFinished()) explosions.remove(i);
+  }
+}
+
+void renderExplodingSystems() {
+  background(0);
+
+  // Grade de fundo fósforo verde
+  stroke(0, 30, 10);
+  strokeWeight(1);
+  for (int i = 0; i < width; i += 40) line(i, 0, i, height);
+  for (int i = 0; i < height; i += 40) line(0, i, width, i);
+
+  for (Bullet b : bullets) b.display();
+  
+  // NOTA: Omitimos player.display() para que o canhão original 
+  // pareça destruído e substituído pelos sprites de explosão.
+
+  for (Helicopter h : helicopters) h.display();
+  for (Parachuter p : parachuters) p.display();
+  for (Explosion e : explosions) e.display();
+
+  // Chão iluminado
+  float groundY = height - 40;
+  stroke(0, 255, 100, 30);
+  strokeWeight(6);
+  line(0, groundY, width, groundY);
+  
+  stroke(0, 255, 120);
+  strokeWeight(2.5);
+  line(0, groundY, width, groundY);
+  
+  stroke(0, 180, 80);
+  strokeWeight(1.5);
+  line(0, groundY + 6, width, groundY + 6);
+  
+  stroke(0, 80, 35, 150);
+  strokeWeight(1.5);
+  for (int xPos = 0; xPos < width; xPos += 15) {
+    line(xPos, groundY + 8, xPos, height);
+  }
+  noStroke();
+
+  // Scanlines CRT globais
+  stroke(0, 18);
+  strokeWeight(1);
+  for (int y = 0; y < height; y += 4) {
+    line(0, y, width, y);
+  }
+  noStroke();
+  
   renderHUD();
 }
 
@@ -165,10 +289,9 @@ void updateSystems() {
   }
 
   if (playerLives <= 0) {
-    if (useRanking) {
-      rankingSystem.addScore(playerNameInput, score);
-    }
-    gameState = GAME_OVER;
+    gameState = CANNON_EXPLODING;
+    explosionTimer = 0;
+    playHelicopterExplosionSound();
   }
 
   player.update();
@@ -268,6 +391,31 @@ void increaseWave() {
 // CONTROLES DE ENTRADA DO JOGADOR
 // ==========================================
 void keyPressed() {
+  // Hook do Sistema de Créditos (Tratamento de Inputs e Bloqueio)
+  if (showCredits && (gameState == MENU || gameState == GAME_OVER)) {
+    if (key == 'c' || key == 'C' || keyCode == ESC) {
+      showCredits = false;
+      key = 0; // Evita que o Processing feche ou execute outra ação padrão do ESC
+      cursor(ARROW);
+      playShootSound();
+    } else if (keyCode == UP) {
+      creditsScrollY = max(-100, creditsScrollY - 25);
+    } else if (keyCode == DOWN) {
+      creditsScrollY = min(creditsMaxScroll + 100, creditsScrollY + 25);
+    }
+    return; // Bloqueia qualquer outro input do jogo enquanto a overlay estiver ativa
+  }
+
+  // Pressionar 'C' para abrir os créditos no Menu ou Game Over
+  if (!showCredits && (gameState == MENU || gameState == GAME_OVER)) {
+    if (key == 'c' || key == 'C') {
+      showCredits = true;
+      resetCredits();
+      playShootSound();
+      return;
+    }
+  }
+
   if (gameState == MENU) {
     if (keyCode == ENTER) {
       gameState = RANKING_CHOICE;
@@ -484,7 +632,7 @@ void drawMenu() {
   noStroke();
   fill(0, 180, 80);
   textSize(18);
-  text("P = Pausar | TAB = Ranking", width / 2, height - 50);
+  text("P = Pausar | TAB = Ranking | C = Créditos", width / 2, height - 50);
   fill(0, 140, 60);
   text("Os Rapazes Studio", width / 2, height - 20);
 
@@ -722,7 +870,7 @@ void drawGameOver() {
 
   textSize(20);
   float pulseText = 140 + 115 * sin(frameCount * 0.08);
-  drawGlowText("Pressione 'R' para REINICIAR", width / 2, height / 2 + 140, color(255, 80, 80, pulseText));
+  drawGlowText("Pressione 'R' para REINICIAR | 'C' para CRÉDITOS", width / 2, height / 2 + 140, color(255, 80, 80, pulseText));
 
   stroke(0, 22);
   strokeWeight(1);
